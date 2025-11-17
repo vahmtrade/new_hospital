@@ -93,12 +93,27 @@ class HospitalDatabase:
         conn.close()
         return last_id
     
-    def search(self, table, search_term='', column='name'):
-        query = f'SELECT * FROM {table}'
-        if search_term:
-            query += f' WHERE {column} LIKE ?'
-            return self.execute_query(query, (f'%{search_term}%',))
-        return self.execute_query(query)
+    def search(self, table, search_term=''):
+        """Search across all fields in the table"""
+        if not search_term:
+            return self.execute_query(f'SELECT * FROM {table}')
+        
+        # Get column names for the table
+        conn = sqlite3.connect(self.db_name)
+        cursor = conn.cursor()
+        cursor.execute(f'PRAGMA table_info({table})')
+        columns = [col[1] for col in cursor.fetchall()]
+        conn.close()
+        
+        # Build WHERE clause to search all columns
+        where_clauses = []
+        params = []
+        for column in columns:
+            where_clauses.append(f'{column} LIKE ?')
+            params.append(f'%{search_term}%')
+        
+        query = f'SELECT * FROM {table} WHERE {" OR ".join(where_clauses)}'
+        return self.execute_query(query, tuple(params))
     
     def get_all(self, table):
         return self.execute_query(f'SELECT * FROM {table}')
