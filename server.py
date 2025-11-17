@@ -57,6 +57,16 @@ def delete_doctor(doctor_id):
     db.delete('doctors', 'doctor_id', doctor_id)
     return jsonify({'status': 'success'})
 
+@app.route('/appointments/<int:appointment_id>', methods=['DELETE'])
+def delete_appointment(appointment_id):
+    db.delete('appointments', 'appointment_id', appointment_id)
+    return jsonify({'status': 'success'})
+
+@app.route('/medical_records/<int:record_id>', methods=['DELETE'])
+def delete_medical_record(record_id):
+    db.delete('medical_records', 'record_id', record_id)
+    return jsonify({'status': 'success'})
+
 def start_server(hospital_name, port, db_name):
     global db
     db = HospitalDatabase(db_name, hospital_name)

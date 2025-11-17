@@ -84,6 +84,8 @@ class HospitalManagementGUI:
                  bg='#2ecc71', fg='white', font=('Arial', 10)).pack(side='left', padx=5)
         tk.Button(search_frame, text="Add Patient", command=self.add_patient_dialog, 
                  bg='#e74c3c', fg='white', font=('Arial', 10)).pack(side='left', padx=5)
+        tk.Button(search_frame, text="Delete Selected", command=self.delete_patient, 
+                 bg='#c0392b', fg='white', font=('Arial', 10)).pack(side='left', padx=5)
         
         # Table frame
         table_frame = tk.Frame(patients_frame, bg='white')
@@ -130,6 +132,8 @@ class HospitalManagementGUI:
                  bg='#2ecc71', fg='white', font=('Arial', 10)).pack(side='left', padx=5)
         tk.Button(search_frame, text="Add Doctor", command=self.add_doctor_dialog, 
                  bg='#e74c3c', fg='white', font=('Arial', 10)).pack(side='left', padx=5)
+        tk.Button(search_frame, text="Delete Selected", command=self.delete_doctor, 
+                 bg='#c0392b', fg='white', font=('Arial', 10)).pack(side='left', padx=5)
         
         # Table frame
         table_frame = tk.Frame(doctors_frame, bg='white')
@@ -167,6 +171,8 @@ class HospitalManagementGUI:
                  bg='#2ecc71', fg='white', font=('Arial', 10)).pack(side='left', padx=5)
         tk.Button(control_frame, text="Add Appointment", command=self.add_appointment_dialog, 
                  bg='#e74c3c', fg='white', font=('Arial', 10)).pack(side='left', padx=5)
+        tk.Button(control_frame, text="Delete Selected", command=self.delete_appointment, 
+                 bg='#c0392b', fg='white', font=('Arial', 10)).pack(side='left', padx=5)
         
         # Table frame
         table_frame = tk.Frame(appointments_frame, bg='white')
@@ -204,6 +210,8 @@ class HospitalManagementGUI:
                  bg='#2ecc71', fg='white', font=('Arial', 10)).pack(side='left', padx=5)
         tk.Button(control_frame, text="Add Record", command=self.add_medical_record_dialog, 
                  bg='#e74c3c', fg='white', font=('Arial', 10)).pack(side='left', padx=5)
+        tk.Button(control_frame, text="Delete Selected", command=self.delete_medical_record, 
+                 bg='#c0392b', fg='white', font=('Arial', 10)).pack(side='left', padx=5)
         
         # Table frame
         table_frame = tk.Frame(records_frame, bg='white')
@@ -647,6 +655,88 @@ class HospitalManagementGUI:
         
         tk.Button(dialog, text="Save", command=save_record, 
                  bg='#2ecc71', fg='white', font=('Arial', 10, 'bold')).pack(pady=20)
+    
+    def delete_patient(self):
+        selected = self.patients_tree.selection()
+        if not selected:
+            messagebox.showwarning("Warning", "Please select a patient to delete!")
+            return
+        
+        item = self.patients_tree.item(selected[0])
+        values = item['values']
+        patient_id = values[0]
+        patient_name = values[1]
+        hospital = values[6]
+        
+        if messagebox.askyesno("Confirm Delete", f"Are you sure you want to delete patient '{patient_name}' (ID: {patient_id})?"):
+            if hospital == self.hospital_name:
+                # Delete from local database
+                self.local_db_instance.delete('patients', 'patient_id', patient_id)
+                messagebox.showinfo("Success", "Patient deleted successfully!")
+                self.load_patients()
+            else:
+                messagebox.showerror("Error", "Cannot delete patients from remote hospitals!")
+    
+    def delete_doctor(self):
+        selected = self.doctors_tree.selection()
+        if not selected:
+            messagebox.showwarning("Warning", "Please select a doctor to delete!")
+            return
+        
+        item = self.doctors_tree.item(selected[0])
+        values = item['values']
+        doctor_id = values[0]
+        doctor_name = values[1]
+        hospital = values[5]
+        
+        if messagebox.askyesno("Confirm Delete", f"Are you sure you want to delete doctor '{doctor_name}' (ID: {doctor_id})?"):
+            if hospital == self.hospital_name:
+                # Delete from local database
+                self.local_db_instance.delete('doctors', 'doctor_id', doctor_id)
+                messagebox.showinfo("Success", "Doctor deleted successfully!")
+                self.load_doctors()
+            else:
+                messagebox.showerror("Error", "Cannot delete doctors from remote hospitals!")
+    
+    def delete_appointment(self):
+        selected = self.appointments_tree.selection()
+        if not selected:
+            messagebox.showwarning("Warning", "Please select an appointment to delete!")
+            return
+        
+        item = self.appointments_tree.item(selected[0])
+        values = item['values']
+        appointment_id = values[0]
+        hospital = values[6]
+        
+        if messagebox.askyesno("Confirm Delete", f"Are you sure you want to delete appointment ID: {appointment_id}?"):
+            if hospital == self.hospital_name:
+                # Delete from local database
+                self.local_db_instance.delete('appointments', 'appointment_id', appointment_id)
+                messagebox.showinfo("Success", "Appointment deleted successfully!")
+                self.load_appointments()
+            else:
+                messagebox.showerror("Error", "Cannot delete appointments from remote hospitals!")
+    
+    def delete_medical_record(self):
+        selected = self.records_tree.selection()
+        if not selected:
+            messagebox.showwarning("Warning", "Please select a medical record to delete!")
+            return
+        
+        item = self.records_tree.item(selected[0])
+        values = item['values']
+        record_id = values[0]
+        hospital = values[6]
+        
+        if messagebox.askyesno("Confirm Delete", f"Are you sure you want to delete medical record ID: {record_id}?"):
+            if hospital == self.hospital_name:
+                # Delete from local database
+                self.local_db_instance.delete('medical_records', 'record_id', record_id)
+                messagebox.showinfo("Success", "Medical record deleted successfully!")
+                self.load_medical_records()
+            else:
+                messagebox.showerror("Error", "Cannot delete medical records from remote hospitals!")
 
 def main():
     import sys

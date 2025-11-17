@@ -73,3 +73,31 @@ class HospitalClient:
             return response.json() if response.status_code == 200 else None
         except:
             return None
+    
+    def delete_patient(self, patient_id):
+        try:
+            response = requests.delete(f'{self.base_url}/patients/{patient_id}', timeout=5)
+            return response.json() if response.status_code == 200 else None
+        except:
+            return None
+    
+    def delete_doctor(self, doctor_id):
+        try:
+            response = requests.delete(f'{self.base_url}/doctors/{doctor_id}', timeout=5)
+            return response.json() if response.status_code == 200 else None
+        except:
+            return None
+    
+    def delete_appointment(self, appointment_id):
+        try:
+            response = requests.delete(f'{self.base_url}/appointments/{appointment_id}', timeout=5)
+            return response.json() if response.status_code == 200 else None
+        except:
+            return None
+    
+    def delete_medical_record(self, record_id):
+        try:
+            response = requests.delete(f'{self.base_url}/medical_records/{record_id}', timeout=5)
+            return response.json() if response.status_code == 200 else None
+        except:
+            return None
