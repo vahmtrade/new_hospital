@@ -124,3 +124,23 @@ class HospitalDatabase:
         cursor.execute(f'DELETE FROM {table} WHERE {id_column} = ?', (id_value,))
         conn.commit()
         conn.close()
+    
+    def update(self, table, id_column, id_value, data):
+        """Update a record in the table"""
+        conn = sqlite3.connect(self.db_name)
+        cursor = conn.cursor()
+        
+        # Build SET clause
+        set_clauses = []
+        values = []
+        for key, value in data.items():
+            set_clauses.append(f'{key} = ?')
+            values.append(value)
+        
+        # Add id_value at the end for WHERE clause
+        values.append(id_value)
+        
+        query = f'UPDATE {table} SET {", ".join(set_clauses)} WHERE {id_column} = ?'
+        cursor.execute(query, values)
+        conn.commit()
+        conn.close()
